@@ -12,12 +12,12 @@
         /*margin: 0 auto; */
         /*color: #555555;*/
         /*background: #FFFFFF; */
-        font-family: Arial, sans-serif; 
+        font-family: Arial, sans-serif;
         font-size: 14px;
         /*font-family: SourceSansPro;*/
         }
- 
- 
+
+
         #datos{
         float: left;
         margin-top: 0%;
@@ -25,14 +25,14 @@
         margin-right: 2%;
         /*text-align: justify;*/
         }
- 
+
         #encabezado{
         text-align: center;
         margin-left: 35%;
         margin-right: 35%;
         font-size: 15px;
         }
- 
+
         #fact{
         /*position: relative;*/
         float: right;
@@ -42,63 +42,63 @@
         font-size: 20px;
         background:#33AFFF;
         }
- 
+
         section{
         clear: left;
         }
- 
+
         #cliente{
         text-align: left;
         }
- 
+
         #faproveedor{
         width: 40%;
         border-collapse: collapse;
         border-spacing: 0;
         margin-bottom: 15px;
         }
- 
+
         #fac, #fv, #fa{
         color: #FFFFFF;
         font-size: 15px;
         }
- 
+
         #faproveedor thead{
         padding: 20px;
         background:#33AFFF;
         text-align: left;
-        border-bottom: 1px solid #FFFFFF;  
+        border-bottom: 1px solid #FFFFFF;
         }
- 
+
         #faccomprador{
         width: 100%;
         border-collapse: collapse;
         border-spacing: 0;
         margin-bottom: 15px;
         }
- 
+
         #faccomprador thead{
         padding: 20px;
         background: #33AFFF;
         text-align: center;
-        border-bottom: 1px solid #FFFFFF;  
+        border-bottom: 1px solid #FFFFFF;
         }
- 
+
         #facproducto{
         width: 100%;
         border-collapse: collapse;
         border-spacing: 0;
         margin-bottom: 15px;
         }
- 
+
         #facproducto thead{
         padding: 20px;
         background: #33AFFF;
         text-align: center;
-        border-bottom: 1px solid #FFFFFF;  
+        border-bottom: 1px solid #FFFFFF;
         }
- 
-    
+
+
     </style>
     <body>
         @foreach ($compra as $v)
@@ -106,11 +106,11 @@
             <!--<div id="logo">
                 <img src="img/logo.png" alt="" id="imagen">
             </div>-->
-         
+
              <div>
-                
+
                 <table id="datos">
-                    <thead>                        
+                    <thead>
                         <tr>
                             <th id="">DATOS DEL PROVEEDOR</th>
                         </tr>
@@ -126,14 +126,14 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <div id="fact">
                 <p>{{$v->tipo_identificacion}} COMPRA<br/>
                   {{$v->num_compra}}</p>
             </div>
         </header>
         <br>
-        
+
         @endforeach
         <br>
         <section>
@@ -203,7 +203,7 @@
              <!--puedes poner un mensaje aqui-->
              <div id="datos">
                 <p id="encabezado">
-                    <b>webtraining-it.com</b><br>Eyter Higuera<br>Telefono:(+00)123456799<br>Email:webdeveloperphpwordpress@gmail.com
+                    <b>mike.mavc27@gmail.com</b><br>Eyter Higuera<br>Telefono:(+00)123456799<br>Email:webdeveloperphpwordpress@gmail.com
                 </p>
             </div>
         </footer>
