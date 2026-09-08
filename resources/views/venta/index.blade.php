@@ -44,7 +44,7 @@
                                     <th>Cliente</th>
                                     <th>Tipo de identificación</th>
                                     <th>Vendedor</th>
-                                    <th>Total (USD$)</th>
+                                    <th>Total (Gs)</th>
                                     <th>Impuesto</th>
                                     <th>Estado</th>
                                     <th>Cambiar Estado</th>
@@ -72,7 +72,7 @@
                                     <td>{{$vent->cliente}}</td>
                                     <td>{{$vent->tipo_identificacion}}</td>
                                     <td>{{$vent->nombre}}</td>
-                                    <td>${{number_format($vent->total,2)}}</td>
+                                    <td>Gs {{ number_format($vent->total, 0, ",", ".") }}</td>
                                     <td>{{$vent->impuesto}}</td>
                                     <td>
                                       

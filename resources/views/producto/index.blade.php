@@ -45,7 +45,7 @@
                                     <th>Categoria</th>
                                     <th>Producto</th>
                                     <th>Codigo</th>
-                                    <th>Precio Venta (USD$)
+                                    <th>Precio Venta (Gs)
                                     <th>Stock</th>
                                     <th>Imagen</th>
                                     <th>Estado</th>
@@ -62,7 +62,7 @@
                                    <td>{{$prod->categoria}}</td>
                                     <td>{{$prod->nombre}}</td>
                                     <td>{{$prod->codigo}}</td>
-                                    <td>{{$prod->precio_venta}}</td>
+                                    <td>Gs {{ number_format($prod->precio_venta, 0, ",", ".") }}</td>
                                     <td>{{$prod->stock}}</td>
 
                                     <td>

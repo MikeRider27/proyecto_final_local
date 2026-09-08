@@ -133,10 +133,10 @@
                     <tr class="bg-success">
                         <th>Eliminar</th>
                         <th>Producto</th>
-                        <th>Precio Venta (USD$)</th>
+                        <th>Precio Venta (Gs)</th>
                         <th>Descuento</th>
                         <th>Cantidad</th>
-                        <th>SubTotal (USD$)</th>
+                        <th>SubTotal (Gs)</th>
                     </tr>
                 </thead>
                  
@@ -146,21 +146,21 @@
                    <th></th>
                    <th></th>
                    <th></th>
-                   <th><h4 id="total">USD$ 0.00</h4><input type="hidden" name="total_venta" id="total_venta">  </th>-->
+                   <th><h4 id="total">Gs 0</h4><input type="hidden" name="total_venta" id="total_venta">  </th>-->
 
                     <tr>
                         <th  colspan="5"><p align="right">TOTAL:</p></th>
-                        <th><p align="right"><span id="total">USD$ 0.00</span> </p></th>
+                        <th><p align="right"><span id="total">Gs 0</span> </p></th>
                     </tr>
 
                     <tr>
                         <th colspan="5"><p align="right">TOTAL IMPUESTO (20%):</p></th>
-                        <th><p align="right"><span id="total_impuesto">USD$ 0.00</span></p></th>
+                        <th><p align="right"><span id="total_impuesto">Gs 0</span></p></th>
                     </tr>
 
                     <tr>
                         <th  colspan="5"><p align="right">TOTAL PAGAR:</p></th>
-                        <th><p align="right"><span align="right" id="total_pagar_html">USD$ 0.00</span> <input type="hidden" name="total_pagar" id="total_pagar"></p></th>
+                        <th><p align="right"><span align="right" id="total_pagar_html">Gs 0</span> <input type="hidden" name="total_pagar" id="total_pagar"></p></th>
                     </tr>  
 
                 </tfoot>
@@ -238,11 +238,11 @@
                     subtotal[cont]=(cantidad*precio_venta)-(cantidad*precio_venta*descuento/100);
                     total= total+subtotal[cont];
 
-                    var fila= '<tr class="selected" id="fila'+cont+'"><td><button type="button" class="btn btn-danger btn-sm" onclick="eliminar('+cont+');"><i class="fa fa-times fa-2x"></i></button></td> <td><input type="hidden" name="id_producto[]" value="'+id_producto+'">'+producto+'</td> <td><input type="number" name="precio_venta[]" value="'+parseFloat(precio_venta).toFixed(2)+'"> </td> <td><input type="number" name="descuento[]" value="'+parseFloat(descuento).toFixed(2)+'"> </td> <td><input type="number" name="cantidad[]" value="'+cantidad+'"> </td> <td>$'+parseFloat(subtotal[cont]).toFixed(2)+'</td></tr>';
+                    var fila= '<tr class="selected" id="fila'+cont+'"><td><button type="button" class="btn btn-danger btn-sm" onclick="eliminar('+cont+');"><i class="fa fa-times fa-2x"></i></button></td> <td><input type="hidden" name="id_producto[]" value="'+id_producto+'">'+producto+'</td> <td><input type="number" name="precio_venta[]" value="'+parseFloat(precio_venta).toFixed(2)+'"> </td> <td><input type="number" name="descuento[]" value="'+parseFloat(descuento).toFixed(2)+'"> </td> <td><input type="number" name="cantidad[]" value="'+cantidad+'"> </td> <td>Gs '+Math.round(subtotal[cont]).toLocaleString("es-PY")+'</td></tr>';
                     cont++;
                     limpiar();
                     totales();
-                    /*$("#total").html("USD$ " + total.toFixed(2));
+                    /*$("#total").html("Gs " + Math.round(total).toLocaleString("es-PY"));
                     $("#total_venta").val(total.toFixed(2));*/   
                     evaluar();
                     $('#detalles').append(fila);
@@ -285,13 +285,13 @@
 
      function totales(){
 
-        $("#total").html("USD$ " + total.toFixed(2));
+        $("#total").html("Gs " + Math.round(total).toLocaleString("es-PY"));
         //$("#total_venta").val(total.toFixed(2));
 
         total_impuesto=total*impuesto/100;
         total_pagar=total+total_impuesto;
-        $("#total_impuesto").html("USD$ " + total_impuesto.toFixed(2));
-        $("#total_pagar_html").html("USD$ " + total_pagar.toFixed(2));
+        $("#total_impuesto").html("Gs " + Math.round(total_impuesto).toLocaleString("es-PY"));
+        $("#total_pagar_html").html("Gs " + Math.round(total_pagar).toLocaleString("es-PY"));
         $("#total_pagar").val(total_pagar.toFixed(2));
       }
 
@@ -314,9 +314,9 @@
         total_impuesto= total*20/100;
         total_pagar_html = total + total_impuesto;
 
-        $("#total").html("USD$" + total);
-        $("#total_impuesto").html("USD$" + total_impuesto);
-        $("#total_pagar_html").html("USD$" + total_pagar_html);
+        $("#total").html("Gs " + Math.round(total).toLocaleString("es-PY"));
+        $("#total_impuesto").html("Gs " + Math.round(total_impuesto).toLocaleString("es-PY"));
+        $("#total_pagar_html").html("Gs " + Math.round(total_pagar_html).toLocaleString("es-PY"));
         $("#total_pagar").val(total_pagar_html.toFixed(2));
         
         $("#fila" + index).remove();

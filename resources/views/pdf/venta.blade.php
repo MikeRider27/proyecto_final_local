@@ -144,9 +144,9 @@
                         <tr id="fa">
                             <th>CANTIDAD</th>
                             <th>PRODUCTO</th>
-                            <th>PRECIO VENTA (USD$)</th>
+                            <th>PRECIO VENTA (Gs)</th>
                             <th>DESCUENTO (%)</th>
-                            <th>SUBTOTAL (USD$)</th>
+                            <th>SUBTOTAL (Gs)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,9 +154,9 @@
                         <tr>
                             <td>{{$det->cantidad}}</td>
                             <td>{{$det->producto}}</td>
-                            <td>${{$det->precio}}</td>
+                            <td>Gs {{ number_format($det->precio, 0, ",", ".") }}</td>
                             <td>{{$det->descuento}}</td>
-                            <td>${{number_format($det->cantidad*$det->precio - $det->cantidad*$det->precio*$det->descuento/100,2)}}</td>
+                            <td>Gs {{ number_format($det->cantidad*$det->precio - $det->cantidad*$det->precio*$det->descuento/100, 0, ",", ".") }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -164,17 +164,17 @@
                         @foreach ($venta as $v)
                         <tr>
                            <th colspan="4"><p align="right">TOTAL:</p></th>
-                           <td><p align="right">${{number_format($v->total,2)}}</p></td>
+                           <td><p align="right">Gs {{ number_format($v->total, 0, ",", ".") }}</p></td>
                         </tr>
 
                         <tr>
                             <th colspan="4"><p align="right">TOTAL IMPUESTO (20%):</p></th>
-                            <td><p align="right">${{number_format($v->total*20/100,2)}}</p></td>
+                            <td><p align="right">Gs {{ number_format($v->total*20/100, 0, ",", ".") }}</p></td>
                         </tr>
 
                         <tr>
                             <th  colspan="4"><p align="right">TOTAL PAGAR:</p></th>
-                            <td><p align="right">${{number_format($v->total+($v->total*20/100),2)}}</p></td>
+                            <td><p align="right">Gs {{ number_format($v->total+($v->total*20/100), 0, ",", ".") }}</p></td>
                         </tr>
 
                         @endforeach

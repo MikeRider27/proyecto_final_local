@@ -47,7 +47,7 @@ class CompraController extends Controller
             
              /*listar los productos en ventana modal*/
              $productos=DB::table('productos as prod')
-             ->select(DB::raw('CONCAT(prod.codigo," ",prod.nombre) AS producto'),'prod.id')
+             ->select(DB::raw("CONCAT(prod.codigo,' ',prod.nombre) AS producto"),'prod.id')
              ->where('prod.condicion','=','1')->get(); 
  
              return view('compra.create',["proveedores"=>$proveedores,"productos"=>$productos]);

@@ -123,9 +123,9 @@
                     <tr class="bg-success">
                         <th>Eliminar</th>
                         <th>Producto</th>
-                        <th>Precio(USD$)</th>
+                        <th>Precio(Gs)</th>
                         <th>Cantidad</th>
-                        <th>SubTotal (USD$)</th>
+                        <th>SubTotal (Gs)</th>
                     </tr>
                 </thead>
                  
@@ -134,17 +134,17 @@
 
                     <tr>
                         <th  colspan="4"><p align="right">TOTAL:</p></th>
-                        <th><p align="right"><span id="total">USD$ 0.00</span> </p></th>
+                        <th><p align="right"><span id="total">Gs 0</span> </p></th>
                     </tr>
 
                     <tr>
                         <th colspan="4"><p align="right">TOTAL IMPUESTO (20%):</p></th>
-                        <th><p align="right"><span id="total_impuesto">USD$ 0.00</span></p></th>
+                        <th><p align="right"><span id="total_impuesto">Gs 0</span></p></th>
                     </tr>
 
                     <tr>
                         <th  colspan="4"><p align="right">TOTAL PAGAR:</p></th>
-                        <th><p align="right"><span align="right" id="total_pagar_html">USD$ 0.00</span> <input type="hidden" name="total_pagar" id="total_pagar"></p></th>
+                        <th><p align="right"><span align="right" id="total_pagar_html">Gs 0</span> <input type="hidden" name="total_pagar" id="total_pagar"></p></th>
                     </tr>  
 
                 </tfoot>
@@ -205,7 +205,7 @@
              subtotal[cont]=cantidad*precio_compra;
              total= total+subtotal[cont];
              
-             var fila= '<tr class="selected" id="fila'+cont+'"><td><button type="button" class="btn btn-danger btn-sm" onclick="eliminar('+cont+');"><i class="fa fa-times fa-2x"></i></button></td> <td><input type="hidden" name="id_producto[]" value="'+id_producto+'">'+producto+'</td> <td><input type="number" id="precio_compra[]" name="precio_compra[]"  value="'+precio_compra+'"> </td>  <td><input type="number" name="cantidad[]" value="'+cantidad+'"> </td> <td>$'+subtotal[cont]+' </td></tr>';
+             var fila= '<tr class="selected" id="fila'+cont+'"><td><button type="button" class="btn btn-danger btn-sm" onclick="eliminar('+cont+');"><i class="fa fa-times fa-2x"></i></button></td> <td><input type="hidden" name="id_producto[]" value="'+id_producto+'">'+producto+'</td> <td><input type="number" id="precio_compra[]" name="precio_compra[]"  value="'+precio_compra+'"> </td>  <td><input type="number" name="cantidad[]" value="'+cantidad+'"> </td> <td>Gs '+Math.round(subtotal[cont]).toLocaleString("es-PY")+' </td></tr>';
              cont++;
              limpiar();
              totales();
@@ -239,12 +239,12 @@
 
      function totales(){
 
-        $("#total").html("USD$ " + total.toFixed(2));
+        $("#total").html("Gs " + Math.round(total).toLocaleString("es-PY"));
 
         total_impuesto=total*impuesto/100;
         total_pagar=total+total_impuesto;
-        $("#total_impuesto").html("USD$ " + total_impuesto.toFixed(2));
-        $("#total_pagar_html").html("USD$ " + total_pagar.toFixed(2));
+        $("#total_impuesto").html("Gs " + Math.round(total_impuesto).toLocaleString("es-PY"));
+        $("#total_pagar_html").html("Gs " + Math.round(total_pagar).toLocaleString("es-PY"));
         $("#total_pagar").val(total_pagar.toFixed(2));
         
      }
@@ -269,9 +269,9 @@
         total_impuesto= total*20/100;
         total_pagar_html = total + total_impuesto;
        
-        $("#total").html("USD$" + total);
-        $("#total_impuesto").html("USD$" + total_impuesto);
-        $("#total_pagar_html").html("USD$" + total_pagar_html);
+        $("#total").html("Gs " + Math.round(total).toLocaleString("es-PY"));
+        $("#total_impuesto").html("Gs " + Math.round(total_impuesto).toLocaleString("es-PY"));
+        $("#total_pagar_html").html("Gs " + Math.round(total_pagar_html).toLocaleString("es-PY"));
         $("#total_pagar").val(total_pagar_html.toFixed(2));
        
         $("#fila" + index).remove();

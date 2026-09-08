@@ -48,7 +48,7 @@ class VentaController extends Controller
              /*listar los productos en ventana modal*/
              $productos=DB::table('productos as prod')
              ->join('detalle_compras','prod.id','=','detalle_compras.idproducto')
-             ->select(DB::raw('CONCAT(prod.codigo," ",prod.nombre) AS producto'),'prod.id','prod.stock','prod.precio_venta')
+             ->select(DB::raw("CONCAT(prod.codigo,' ',prod.nombre) AS producto"),'prod.id','prod.stock','prod.precio_venta')
              ->where('prod.condicion','=','1')
              ->where('prod.stock','>','0')
              ->groupBy('producto','prod.id','prod.stock','prod.precio_venta')

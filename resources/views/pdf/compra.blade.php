@@ -162,9 +162,9 @@
                         <tr id="fa">
                             <th>CANTIDAD</th>
                             <th>PRODUCTO</th>
-                            <th>PRECIO COMPRA (USD$)</th>
+                            <th>PRECIO COMPRA (Gs)</th>
                             <!--<th>CANTIDAD*PRECIO</th>-->
-                            <th>SUBTOTAL (USD$)</th>
+                            <th>SUBTOTAL (Gs)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,9 +172,9 @@
                         <tr>
                             <td>{{$det->cantidad}}</td>
                             <td>{{$det->producto}}</td>
-                            <td>${{$det->precio}}</td>
+                            <td>Gs {{ number_format($det->precio, 0, ",", ".") }}</td>
                             <!--<td>${{$det->cantidad*$det->precio}}</td>-->
-                            <td>${{number_format($det->cantidad*$det->precio,2)}}</td>
+                            <td>Gs {{ number_format($det->cantidad*$det->precio, 0, ",", ".") }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -182,15 +182,15 @@
                         @foreach ($compra as $c)
                         <tr>
                            <th colspan="3"><p align="right">TOTAL:</p></th>
-                            <td><p align="right">${{number_format($c->total)}}<p></td>
+                            <td><p align="right">Gs {{ number_format($c->total, 0, ",", ".") }}<p></td>
                         </tr>
                         <tr>
                            <th colspan="3"><p align="right">TOTAL IMPUESTO (20%):</p></th>
-                            <td><p align="right">$ {{number_format($c->total*$c->impuesto,2)}}</p></td>
+                            <td><p align="right">Gs {{ number_format($c->total*$c->impuesto, 0, ",", ".") }}</p></td>
                         </tr>
                         <tr>
                            <th  colspan="3"><p align="right">TOTAL PAGAR:</p></th>
-                            <td><p align="right">$ {{number_format($c->total+($c->total*$c->impuesto),2)}}</p></td>
+                            <td><p align="right">Gs {{ number_format($c->total+($c->total*$c->impuesto), 0, ",", ".") }}</p></td>
                         </tr>
                         @endforeach
                     </tfoot>

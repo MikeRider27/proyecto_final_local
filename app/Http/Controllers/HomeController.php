@@ -25,15 +25,15 @@ class HomeController extends Controller
     public function index()
     {
         
-        $comprasmes=DB::select('SELECT monthname(c.fecha_compra) as mes, sum(c.total) as totalmes from compras c where c.estado="Registrado" group by monthname(c.fecha_compra) order by month(c.fecha_compra) desc limit 12');
-       
-        $ventasmes=DB::select('SELECT monthname(v.fecha_venta) as mes, sum(v.total) as totalmes from ventas v where v.estado="Registrado" group by monthname(v.fecha_venta) order by month(v.fecha_venta) desc limit 12');
-        
-        $ventasdia=DB::select('SELECT DATE_FORMAT(v.fecha_venta,"%d/%m/%Y") as dia, sum(v.total) as totaldia from ventas v where v.estado="Registrado" group by v.fecha_venta order by day(v.fecha_venta) desc limit 15');
+        $comprasmes=DB::select("SELECT trim(to_char(c.fecha_compra,'FMMonth')) as mes, sum(c.total) as totalmes from compras c where c.estado='Registrado' group by trim(to_char(c.fecha_compra,'FMMonth')) order by min(extract(month from c.fecha_compra)) desc limit 12");
 
-        $productosvendidos=DB::select('SELECT p.nombre as producto, sum(dv.cantidad) as cantidad from productos p inner join detalle_ventas dv on p.id=dv.idproducto inner join ventas v on dv.idventa=v.id where v.estado="Registrado" and year(v.fecha_venta)=year(curdate()) group by p.nombre order by sum(dv.cantidad) desc limit 10');
+        $ventasmes=DB::select("SELECT trim(to_char(v.fecha_venta,'FMMonth')) as mes, sum(v.total) as totalmes from ventas v where v.estado='Registrado' group by trim(to_char(v.fecha_venta,'FMMonth')) order by min(extract(month from v.fecha_venta)) desc limit 12");
 
-        $totales=DB::select('SELECT (select ifnull(sum(c.total),0) from compras c where DATE(c.fecha_compra)=curdate() and c.estado="Registrado") as totalcompra, (select ifnull(sum(v.total),0) from ventas v where DATE(v.fecha_venta)=curdate() and v.estado="Registrado") as totalventa');
+        $ventasdia=DB::select("SELECT to_char(v.fecha_venta,'DD/MM/YYYY') as dia, sum(v.total) as totaldia from ventas v where v.estado='Registrado' group by v.fecha_venta order by extract(day from v.fecha_venta) desc limit 15");
+
+        $productosvendidos=DB::select("SELECT p.nombre as producto, sum(dv.cantidad) as cantidad from productos p inner join detalle_ventas dv on p.id=dv.idproducto inner join ventas v on dv.idventa=v.id where v.estado='Registrado' and extract(year from v.fecha_venta)=extract(year from current_date) group by p.nombre order by sum(dv.cantidad) desc limit 10");
+
+        $totales=DB::select("SELECT (select coalesce(sum(c.total),0) from compras c where c.fecha_compra::date=current_date and c.estado='Registrado') as totalcompra, (select coalesce(sum(v.total),0) from ventas v where v.fecha_venta::date=current_date and v.estado='Registrado') as totalventa");
 
             return view('home',["comprasmes"=>$comprasmes,"ventasmes"=>$ventasmes,"ventasdia"=>$ventasdia,"productosvendidos"=>$productosvendidos,"totales"=>$totales]);
     
