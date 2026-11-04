@@ -103,6 +103,27 @@
     <script src="{{asset('js/template.js')}}"></script>
     <script src="{{asset('js/sweetalert2.all.min.js')}}"></script>
 
+    {{-- Avisos de resultado (éxito, error y validación) --}}
+    @php
+        $aviso = session('success')
+            ? ['type' => 'success', 'title' => session('success')]
+            : (session('error') || $errors->any()
+                ? ['type' => 'error', 'title' => session('error') ?: $errors->first()]
+                : null);
+    @endphp
+    @if ($aviso)
+    <script>
+        (function (aviso) {
+            var Alerta = window.Swal || window.Sweetalert2 || window.swal;
+            if (!Alerta) { return; }
+            Alerta.fire ? Alerta.fire({
+                toast: true, position: 'top-end', type: aviso.type, icon: aviso.type, title: aviso.title,
+                showConfirmButton: false, timer: 4500
+            }) : Alerta({ toast: true, position: 'top-end', type: aviso.type, title: aviso.title, showConfirmButton: false, timer: 4500 });
+        })(@json($aviso));
+    </script>
+    @endif
+
     <script>
 
          /*EDITAR CATEGORIA EN VENTANA MODAL*/

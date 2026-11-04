@@ -56,20 +56,30 @@ class CompraController extends Controller
  
          public function store(Request $request){
          
-         //dd($request->all());
- 
+             $request->validate([
+                 'id_proveedor' => 'required|integer|exists:proveedores,id',
+                 'tipo_identificacion' => 'required|in:FACTURA,TICKET',
+                 'num_compra' => 'required|string|max:10',
+                 'id_producto' => 'required|array|min:1',
+                 'id_producto.*' => 'integer|exists:productos,id',
+                 'cantidad.*' => 'required|integer|min:1',
+                 'precio_compra.*' => 'required|numeric|min:0',
+             ], [
+                 'id_producto.required' => 'Agregá al menos un producto a la compra.',
+             ]);
+
              try{
- 
+
                  DB::beginTransaction();
- 
-                 $mytime= Carbon::now('America/Costa_Rica');
- 
+
+                 $mytime= Carbon::now();
+
                  $compra = new Compra();
                  $compra->idproveedor = $request->id_proveedor;
                  $compra->idusuario = \Auth::user()->id;
                  $compra->tipo_identificacion = $request->tipo_identificacion;
                  $compra->num_compra = $request->num_compra;
-                 $compra->fecha_compra = $mytime->toDateString();
+                 $compra->fecha_compra = $mytime;
                  $compra->impuesto = '0.20';
                  $compra->total = $request->total_pagar;
                  $compra->estado = 'Registrado';
@@ -92,19 +102,25 @@ class CompraController extends Controller
                      $detalle->idcompra = $compra->id;
                      $detalle->idproducto = $id_producto[$cont];
                      $detalle->cantidad = $cantidad[$cont];
-                     $detalle->precio = $precio[$cont];    
+                     $detalle->precio = $precio[$cont];
                      $detalle->save();
+
+                     // La compra ingresa mercadería al stock
+                     DB::table('productos')->where('id', $detalle->idproducto)->increment('stock', $detalle->cantidad);
+
                      $cont=$cont+1;
                  }
-                     
+
                  DB::commit();
- 
-             } catch(Exception $e){
-                 
+
+             } catch(\Throwable $e){
+
                  DB::rollBack();
+                 report($e);
+                 return Redirect::back()->withInput()->with('error', 'No se pudo registrar la compra. Intentá de nuevo.');
              }
- 
-             return Redirect::to('compra');
+
+             return Redirect::to('compra')->with('success', 'Compra registrada correctamente.');
          }
  
          public function show($id){
@@ -138,10 +154,20 @@ class CompraController extends Controller
          public function destroy(Request $request){
  
      
-                 $compra = Compra::findOrFail($request->id_compra);
-                 $compra->estado = 'Anulado';
-                 $compra->save();
-                 return Redirect::to('compra');
+                 DB::transaction(function () use ($request) {
+                     $compra = Compra::lockForUpdate()->findOrFail($request->id_compra);
+                     if ($compra->estado === 'Anulado') {
+                         return; // ya estaba anulada: no se descuenta el stock dos veces
+                     }
+                     $compra->estado = 'Anulado';
+                     $compra->save();
+
+                     // Se retira del stock lo que había ingresado esta compra
+                     foreach (DetalleCompra::where('idcompra', $compra->id)->get() as $detalle) {
+                         DB::table('productos')->where('id', $detalle->idproducto)->decrement('stock', $detalle->cantidad);
+                     }
+                 });
+                 return Redirect::to('compra')->with('success', 'Compra anulada.');
  
      }
  

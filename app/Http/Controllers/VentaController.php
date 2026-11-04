@@ -60,19 +60,31 @@ class VentaController extends Controller
         }
  
          public function store(Request $request){
-         
-         
+
+             $request->validate([
+                 'id_cliente' => 'required|integer|exists:clientes,id',
+                 'tipo_identificacion' => 'required|in:FACTURA,TICKET',
+                 'num_venta' => 'required|string|max:10',
+                 'id_producto' => 'required|array|min:1',
+                 'id_producto.*' => 'integer|exists:productos,id',
+                 'cantidad.*' => 'required|integer|min:1',
+                 'precio_venta.*' => 'required|numeric|min:0',
+                 'descuento.*' => 'required|numeric|min:0|max:99.99',
+             ], [
+                 'id_producto.required' => 'Agregá al menos un producto a la venta.',
+             ]);
+
              try{
- 
+
                  DB::beginTransaction();
-                 $mytime= Carbon::now('America/Costa_Rica');
- 
+                 $mytime= Carbon::now();
+
                  $venta = new Venta();
                  $venta->idcliente = $request->id_cliente;
                  $venta->idusuario = \Auth::user()->id;
                  $venta->tipo_identificacion = $request->tipo_identificacion;
                  $venta->num_venta = $request->num_venta;
-                 $venta->fecha_venta = $mytime->toDateString();
+                 $venta->fecha_venta = $mytime;
                  $venta->impuesto = "0.20";
                  $venta->total=$request->total_pagar;
                  $venta->estado = 'Registrado';
@@ -97,19 +109,35 @@ class VentaController extends Controller
                      $detalle->idproducto = $id_producto[$cont];
                      $detalle->cantidad = $cantidad[$cont];
                      $detalle->precio = $precio[$cont];
-                     $detalle->descuento = $descuento[$cont];           
+                     $detalle->descuento = $descuento[$cont];
+
+                     // Se bloquea el producto y se verifica que alcance el stock antes de descontarlo
+                     $producto = DB::table('productos')->where('id', $detalle->idproducto)->lockForUpdate()->first();
+                     if ($producto->stock < $detalle->cantidad) {
+                         throw new \DomainException("Stock insuficiente para «{$producto->nombre}» (disponible: {$producto->stock}).");
+                     }
+
                      $detalle->save();
+                     DB::table('productos')->where('id', $detalle->idproducto)->decrement('stock', $detalle->cantidad);
+
                      $cont=$cont+1;
                  }
-                     
+
                  DB::commit();
- 
-             } catch(Exception $e){
-                 
+
+             } catch(\DomainException $e){
+
                  DB::rollBack();
+                 return Redirect::back()->withInput()->with('error', $e->getMessage());
+
+             } catch(\Throwable $e){
+
+                 DB::rollBack();
+                 report($e);
+                 return Redirect::back()->withInput()->with('error', 'No se pudo registrar la venta. Intentá de nuevo.');
              }
- 
-             return Redirect::to('venta');
+
+             return Redirect::to('venta')->with('success', 'Venta registrada correctamente.');
          }
  
          public function show($id){
@@ -145,10 +173,20 @@ class VentaController extends Controller
          
          public function destroy(Request $request){
  
-             $venta = Venta::findOrFail($request->id_venta);
-             $venta->estado = 'Anulado';
-             $venta->save();
-             return Redirect::to('venta');
+             DB::transaction(function () use ($request) {
+                 $venta = Venta::lockForUpdate()->findOrFail($request->id_venta);
+                 if ($venta->estado === 'Anulado') {
+                     return; // ya estaba anulada: no se devuelve el stock dos veces
+                 }
+                 $venta->estado = 'Anulado';
+                 $venta->save();
+
+                 // La mercadería de la venta anulada vuelve al stock
+                 foreach (DetalleVenta::where('idventa', $venta->id)->get() as $detalle) {
+                     DB::table('productos')->where('id', $detalle->idproducto)->increment('stock', $detalle->cantidad);
+                 }
+             });
+             return Redirect::to('venta')->with('success', 'Venta anulada.');
  
         }
  
