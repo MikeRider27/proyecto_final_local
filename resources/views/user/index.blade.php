@@ -62,7 +62,7 @@
                                     <td>{{$user->rol}}</td>
                             
                                     <td>
-                                         <img src="{{asset('storage/img/usuario/'.$user->imagen)}}" id="imagen1" alt="{{$user->nombre}}" class="img-responsive" width="100px" height="100px">
+                                         <img src="{{asset('storage/img/usuario/'.$user->imagen)}}" onerror="this.onerror=null;this.src='{{asset('img/sin-imagen.svg')}}'" alt="{{$user->nombre}}" class="img-responsive" width="100px" height="100px">
                                     </td>
 
                                     <td>

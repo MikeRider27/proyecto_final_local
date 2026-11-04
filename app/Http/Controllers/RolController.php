@@ -23,7 +23,7 @@ class RolController extends Controller
             $sql=trim($request->get('buscarTexto'));
             $roles=DB::table('roles')->where('nombre','LIKE','%'.$sql.'%')
             ->orderBy('id','desc')
-            ->paginate(3);
+            ->paginate(10);
             return view('rol.index',["roles"=>$roles,"buscarTexto"=>$sql]);
             //return $roles;
         }

@@ -29,7 +29,7 @@ class ProductoController extends Controller
             ->where('p.nombre','LIKE','%'.$sql.'%')
             ->orwhere('p.codigo','LIKE','%'.$sql.'%')
             ->orderBy('p.id','desc')
-            ->paginate(3);
+            ->paginate(10);
            
             /*listar las categorias en ventana modal*/
             $categorias=DB::table('categorias')

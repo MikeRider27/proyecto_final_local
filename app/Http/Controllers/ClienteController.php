@@ -26,7 +26,7 @@ class ClienteController extends Controller
             ->where('nombre','LIKE','%'.$sql.'%')
             ->orwhere('num_documento','LIKE','%'.$sql.'%')
             ->orderBy('id','desc')
-            ->paginate(3);
+            ->paginate(10);
             return view('cliente.index',["clientes"=>$clientes,"buscarTexto"=>$sql]);
             //return $clientes;
         }

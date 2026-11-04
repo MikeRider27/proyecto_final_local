@@ -26,7 +26,7 @@ class UserController extends Controller
             ->where('users.nombre','LIKE','%'.$sql.'%')
             ->orwhere('users.num_documento','LIKE','%'.$sql.'%')
             ->orderBy('users.id','desc')
-            ->paginate(3);
+            ->paginate(10);
 
              /*listar los roles en ventana modal*/
             $roles=DB::table('roles')

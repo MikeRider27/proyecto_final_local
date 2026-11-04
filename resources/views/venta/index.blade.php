@@ -67,13 +67,13 @@
                                      </a>
                                    </td>
 
-                                    <td>{{$vent->fecha_venta}}</td>
+                                    <td style="white-space:nowrap">{{ date('d/m/Y H:i', strtotime($vent->fecha_venta)) }}</td>
                                     <td>{{$vent->num_venta}}</td>
                                     <td>{{$vent->cliente}}</td>
                                     <td>{{$vent->tipo_identificacion}}</td>
                                     <td>{{$vent->nombre}}</td>
-                                    <td>Gs {{ number_format($vent->total, 0, ",", ".") }}</td>
-                                    <td>{{$vent->impuesto}}</td>
+                                    <td style="white-space:nowrap">Gs {{ number_format($vent->total, 0, ",", ".") }}</td>
+                                    <td>{{ rtrim(rtrim(number_format($vent->impuesto * 100, 2, ',', ''), '0'), ',') }} %</td>
                                     <td>
                                       
                                       @if($vent->estado=="Registrado")

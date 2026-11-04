@@ -67,13 +67,13 @@
                                      </a>
                                    </td>
 
-                                    <td>{{$comp->fecha_compra}}</td>
+                                    <td style="white-space:nowrap">{{ date('d/m/Y H:i', strtotime($comp->fecha_compra)) }}</td>
                                     <td>{{$comp->num_compra}}</td>
                                     <td>{{$comp->proveedor}}</td>
                                     <td>{{$comp->tipo_identificacion}}</td>
                                     <td>{{$comp->nombre}}</td>
-                                    <td>Gs {{ number_format($comp->total, 0, ",", ".") }}</td>
-                                    <td>{{$comp->impuesto}}</td>
+                                    <td style="white-space:nowrap">Gs {{ number_format($comp->total, 0, ",", ".") }}</td>
+                                    <td>{{ rtrim(rtrim(number_format($comp->impuesto * 100, 2, ',', ''), '0'), ',') }} %</td>
                                     <td>
                                       
                                       @if($comp->estado=="Registrado")
