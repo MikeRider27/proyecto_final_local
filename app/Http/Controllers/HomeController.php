@@ -25,9 +25,10 @@ class HomeController extends Controller
     public function index()
     {
         
-        $comprasmes=DB::select("SELECT trim(to_char(c.fecha_compra,'FMMonth')) as mes, sum(c.total) as totalmes from compras c where c.estado='Registrado' group by trim(to_char(c.fecha_compra,'FMMonth')) order by min(extract(month from c.fecha_compra)) desc limit 12");
+        // Últimos 12 meses (incluido el actual), agrupados por mes calendario y del más reciente al más antiguo.
+        $comprasmes=DB::select("SELECT to_char(date_trunc('month', c.fecha_compra),'FMMonth') as mes, sum(c.total) as totalmes from compras c where c.estado='Registrado' and c.fecha_compra >= date_trunc('month', current_date) - interval '11 months' group by date_trunc('month', c.fecha_compra) order by date_trunc('month', c.fecha_compra) desc");
 
-        $ventasmes=DB::select("SELECT trim(to_char(v.fecha_venta,'FMMonth')) as mes, sum(v.total) as totalmes from ventas v where v.estado='Registrado' group by trim(to_char(v.fecha_venta,'FMMonth')) order by min(extract(month from v.fecha_venta)) desc limit 12");
+        $ventasmes=DB::select("SELECT to_char(date_trunc('month', v.fecha_venta),'FMMonth') as mes, sum(v.total) as totalmes from ventas v where v.estado='Registrado' and v.fecha_venta >= date_trunc('month', current_date) - interval '11 months' group by date_trunc('month', v.fecha_venta) order by date_trunc('month', v.fecha_venta) desc");
 
         $ventasdia=DB::select("SELECT to_char(v.fecha_venta,'DD/MM/YYYY') as dia, sum(v.total) as totaldia from ventas v where v.estado='Registrado' group by v.fecha_venta order by extract(day from v.fecha_venta) desc limit 15");
 
