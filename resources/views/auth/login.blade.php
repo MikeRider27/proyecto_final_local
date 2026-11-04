@@ -1,35 +1,70 @@
 @extends('auth.contenido')
 
 @section('login')
-<div class="row justify-content-center">
-      <div class="col-md-5">
-        <div class="card-group mb-0">
-          <div class="card p-4">
-          <form class="form-horizontal was-validated" method="POST" action="{{route('login')}}">
-          {{ csrf_field() }}
-              <div class="card-body">
-              <h3 class="text-center bg-success">Compras - Ventas</h3>
-             
-              <div class="form-group mb-3{{$errors->has('usuario' ? 'is-invalid' : '')}}">
-                <span class="input-group-addon"><i class="icon-user"></i></span>
-                <input type="text" value="{{old('usuario')}}" name="usuario" id="usuario" class="form-control" placeholder="Usuario">
-                {!!$errors->first('usuario','<span class="invalid-feedback">:message</span>')!!}
-              </div>
-              <div class="form-group mb-4{{$errors->has('password' ? 'is-invalid' : '')}}">
-                <span class="input-group-addon"><i class="icon-lock"></i></span>
-                <input type="password" name="password" id="password" class="form-control" placeholder="Password">
-                {!!$errors->first('password','<span class="invalid-feedback">:message</span>')!!} 
-              </div>
-              <div class="row">
-                <div class="col-6">
-                  <button type="submit" class="btn btn-success px-4"><i class="fa fa-sign-in fa-2x"></i> Iniciar sesión</button>
-                </div>
-              </div>
-            </div>
-          </form>
-          </div>
+<div class="auth-page">
 
+    <aside class="auth-aside">
+        <div class="brand">
+            <span class="brand-logo"><i class="fa fa-cube"></i></span>
+            Compras & Ventas
         </div>
-      </div>
-    </div>
+
+        <div>
+            <h1>Tu negocio, <span>bajo control</span>.</h1>
+            <p>Gestioná inventario, proveedores, clientes, compras y ventas desde un solo lugar.</p>
+            <ul class="auth-features">
+                <li><i class="fa fa-cube"></i> Stock de productos actualizado al instante</li>
+                <li><i class="fa fa-file-pdf-o"></i> Comprobantes de compra y venta en PDF</li>
+                <li><i class="fa fa-line-chart"></i> Estadísticas mensuales de tu operación</li>
+            </ul>
+        </div>
+
+        <footer>&copy; {{ date('Y') }} · Desarrollado por Miguel Villalba</footer>
+    </aside>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <h2>Bienvenido de nuevo</h2>
+            <p class="lead">Ingresá tus credenciales para continuar.</p>
+
+            @if ($errors->any())
+                <div class="auth-error">
+                    <i class="fa fa-exclamation-circle"></i>
+                    {{ $errors->first('usuario') ?: $errors->first('password') ?: $errors->first() }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" autocomplete="on">
+                {{ csrf_field() }}
+
+                <div class="auth-field">
+                    <label for="usuario">Usuario</label>
+                    <div class="auth-input">
+                        <i class="fa fa-user-o"></i>
+                        <input type="text" name="usuario" id="usuario" value="{{ old('usuario') }}"
+                               class="form-control" placeholder="Tu nombre de usuario" required autofocus>
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="password">Contraseña</label>
+                    <div class="auth-input">
+                        <i class="fa fa-lock"></i>
+                        <input type="password" name="password" id="password"
+                               class="form-control" placeholder="••••••••" required>
+                        <button type="button" class="toggle-pass" aria-label="Mostrar contraseña"
+                                onclick="var p=document.getElementById('password'),s=p.type==='password';p.type=s?'text':'password';this.firstElementChild.className='fa '+(s?'fa-eye-slash':'fa-eye');">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary auth-submit">
+                    Iniciar sesión <i class="fa fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </main>
+
+</div>
 @endsection
