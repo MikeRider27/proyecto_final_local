@@ -73,6 +73,8 @@ return [
             'prefix_indexes' => true,
             'schema' => 'public',
             'sslmode' => 'prefer',
+            // Misma zona horaria que la app, para que current_date ("hoy") sea el día local
+            'timezone' => env('DB_TIMEZONE', env('APP_TIMEZONE', 'America/Asuncion')),
         ],
 
         'sqlsrv' => [

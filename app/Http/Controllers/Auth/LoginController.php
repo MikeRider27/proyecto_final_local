@@ -20,7 +20,7 @@ class LoginController extends Controller
              return redirect('/home');
          }
 
-         return back()->withErrors(['usuario' => trans('auth.failed')])
+         return back()->withErrors(['usuario' => 'Usuario o contraseña incorrectos, o el usuario está desactivado.'])
          ->withInput(request(['usuario']));
      }
 
@@ -28,6 +28,9 @@ class LoginController extends Controller
         $this->validate($request,[
             'usuario' => 'required|string',
             'password' => 'required|string'
+        ], [
+            'usuario.required' => 'Ingresá tu usuario.',
+            'password.required' => 'Ingresá tu contraseña.',
         ]);
 
     }
