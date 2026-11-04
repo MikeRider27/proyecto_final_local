@@ -43,19 +43,20 @@ class VentaController extends Controller
         public function create(){
  
              /*listar las clientes en ventana modal*/
-             $clientes=DB::table('clientes')->get();
-            
-             /*listar los productos en ventana modal*/
+             $clientes=DB::table('clientes')->orderBy('nombre')->get();
+
+             /*listar los productos con stock disponible*/
              $productos=DB::table('productos as prod')
-             ->join('detalle_compras','prod.id','=','detalle_compras.idproducto')
-             ->select(DB::raw("CONCAT(prod.codigo,' ',prod.nombre) AS producto"),'prod.id','prod.stock','prod.precio_venta')
+             ->select(DB::raw("CONCAT(prod.codigo,' ',prod.nombre) AS producto"),'prod.id','prod.codigo','prod.nombre','prod.stock','prod.precio_venta')
              ->where('prod.condicion','=','1')
              ->where('prod.stock','>','0')
-             ->groupBy('producto','prod.id','prod.stock','prod.precio_venta')
-             ->get(); 
- 
- 
-             return view('venta.create',["clientes"=>$clientes,"productos"=>$productos]);
+             ->orderBy('prod.nombre')
+             ->get();
+
+             // Número sugerido para el comprobante (se puede modificar)
+             $siguiente = sprintf('V-%06d', (Venta::max('id') ?? 0) + 1);
+
+             return view('venta.create',["clientes"=>$clientes,"productos"=>$productos,"siguiente"=>$siguiente]);
   
         }
  
@@ -86,14 +87,20 @@ class VentaController extends Controller
                  $venta->num_venta = $request->num_venta;
                  $venta->fecha_venta = $mytime;
                  $venta->impuesto = "0.20";
-                 $venta->total=$request->total_pagar;
+                 // Precio y total salen de la base, no del navegador: subtotal con descuentos + 20 % de impuesto
+                 $precios = DB::table('productos')->whereIn('id', $request->id_producto)->pluck('precio_venta', 'id');
+                 $subtotal = 0;
+                 foreach ($request->id_producto as $i => $idProducto) {
+                     $bruto = $request->cantidad[$i] * $precios[$idProducto];
+                     $subtotal += $bruto - $bruto * $request->descuento[$i] / 100;
+                 }
+                 $venta->total = round($subtotal * 1.20, 2);
                  $venta->estado = 'Registrado';
                  $venta->save();
  
                  $id_producto=$request->id_producto;
                  $cantidad=$request->cantidad;
                  $descuento=$request->descuento;
-                 $precio=$request->precio_venta;
  
                  
                  //Recorro todos los elementos
@@ -108,7 +115,7 @@ class VentaController extends Controller
                      $detalle->idventa = $venta->id;
                      $detalle->idproducto = $id_producto[$cont];
                      $detalle->cantidad = $cantidad[$cont];
-                     $detalle->precio = $precio[$cont];
+                     $detalle->precio = $precios[$id_producto[$cont]];
                      $detalle->descuento = $descuento[$cont];
 
                      // Se bloquea el producto y se verifica que alcance el stock antes de descontarlo

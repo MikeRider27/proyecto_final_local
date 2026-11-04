@@ -43,14 +43,17 @@ class CompraController extends Controller
         public function create(){
  
              /*listar las proveedores en ventana modal*/
-             $proveedores=DB::table('proveedores')->get();
-            
+             $proveedores=DB::table('proveedores')->orderBy('nombre')->get();
+
              /*listar los productos en ventana modal*/
              $productos=DB::table('productos as prod')
-             ->select(DB::raw("CONCAT(prod.codigo,' ',prod.nombre) AS producto"),'prod.id')
-             ->where('prod.condicion','=','1')->get(); 
- 
-             return view('compra.create',["proveedores"=>$proveedores,"productos"=>$productos]);
+             ->select(DB::raw("CONCAT(prod.codigo,' ',prod.nombre) AS producto"),'prod.id','prod.codigo','prod.nombre','prod.stock','prod.precio_venta')
+             ->where('prod.condicion','=','1')->orderBy('prod.nombre')->get();
+
+             // Número sugerido para el comprobante (se puede modificar)
+             $siguiente = sprintf('C-%06d', (Compra::max('id') ?? 0) + 1);
+
+             return view('compra.create',["proveedores"=>$proveedores,"productos"=>$productos,"siguiente"=>$siguiente]);
   
         }
  
@@ -81,7 +84,12 @@ class CompraController extends Controller
                  $compra->num_compra = $request->num_compra;
                  $compra->fecha_compra = $mytime;
                  $compra->impuesto = '0.20';
-                 $compra->total = $request->total_pagar;
+                 // El total se calcula en el servidor (no se confía en el enviado por el navegador): subtotal + 20 % de impuesto
+                 $subtotal = 0;
+                 foreach ($request->id_producto as $i => $_) {
+                     $subtotal += $request->cantidad[$i] * $request->precio_compra[$i];
+                 }
+                 $compra->total = round($subtotal * 1.20, 2);
                  $compra->estado = 'Registrado';
                  $compra->save();
  
