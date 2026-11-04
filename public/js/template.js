@@ -2,7 +2,9 @@
 * CONFIGURATION
 */
   // Active ajax page loader
-  $.ajaxLoad = true;
+  // Desactivado: la app navega con enlaces normales de Laravel. Si está en true,
+  // intercepta los clics del menú (preventDefault) y los enlaces no funcionan.
+  $.ajaxLoad = false;
 
   //required when $.ajaxLoad = true
   //$.defaultPage = 'main.html';
