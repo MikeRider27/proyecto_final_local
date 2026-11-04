@@ -7,48 +7,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Sistema Compras-Ventas con Laravel y Vue Js- mike.mavc27@gmail.com">
     <meta name="keyword" content="Sistema Compras-Ventas con Laravel y Vue Js">
-    <title>Proyecto</title>
+@php
+    $titulos = [
+        'home' => 'Panel', 'categoria' => 'Categorías', 'producto' => 'Productos',
+        'compra' => 'Compras', 'proveedor' => 'Proveedores', 'venta' => 'Ventas',
+        'cliente' => 'Clientes', 'user' => 'Usuarios', 'rol' => 'Roles',
+    ];
+    $tituloPagina = $titulos[request()->segment(1) ?? 'home'] ?? 'Panel';
+    $roles = [1 => 'Administrador', 2 => 'Vendedor', 3 => 'Comprador'];
+    $usuarioActual = Auth::user();
+    $iniciales = collect(explode(' ', trim($usuarioActual->nombre ?: $usuarioActual->usuario)))
+        ->filter()->take(2)->map(fn ($p) => mb_strtoupper(mb_substr($p, 0, 1)))->implode('');
+    $tieneImagen = $usuarioActual->imagen && file_exists(public_path('storage/img/usuario/'.$usuarioActual->imagen));
+@endphp
+    <title>{{ $tituloPagina }} · Compras & Ventas</title>
+    <link rel="icon" href="{{asset('img/favicon.png')}}">
+    <!-- Tipografía -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Icons -->
     <link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
     <link href="{{asset('css/simple-line-icons.min.css')}}" rel="stylesheet">
-    <!-- Main styles for this application -->
+    <!-- Plantilla base + tema propio -->
     <link href="{{asset('css/style.css')}}" rel="stylesheet">
-
-     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js">-->
-
-
+    <link href="{{asset('css/tema.css')}}" rel="stylesheet">
 </head>
 
 <body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
 <header class="app-header navbar">
-        <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button">
+        <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button" aria-label="Menú">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <!--PONER LOGO-->
-        <!--<a class="navbar-brand" href="#"></a>-->
-        <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button">
+        <a class="navbar-brand" href="{{url('home')}}">
+            <span class="brand-logo"><i class="fa fa-cube"></i></span>
+            <span class="brand-text">Compras & Ventas<small>Gestión comercial</small></span>
+        </a>
+        <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" aria-label="Ocultar menú">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <ul class="nav navbar-nav d-md-down-none">
-            <li class="nav-item px-3">
-                <a class="nav-link" href="#">Dashbord</a>
-            </li>
+        <h1 class="page-heading d-md-down-none">{{ $tituloPagina }}</h1>
 
-        </ul>
         <ul class="nav navbar-nav ml-auto">
-
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                    <img src="{{asset('storage/img/usuario/'.Auth::user()->imagen)}}" class="img-avatar" class="img-avatar" alt="admin@bootstrapmaster.com">
-                    <span class="d-md-down-none">{{Auth::user()->usuario}}</span>
+                <a class="nav-link dropdown-toggle user-chip" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    @if ($tieneImagen)
+                        <img src="{{asset('storage/img/usuario/'.$usuarioActual->imagen)}}" class="avatar" alt="{{$usuarioActual->usuario}}">
+                    @else
+                        <span class="avatar">{{ $iniciales }}</span>
+                    @endif
+                    <span class="user-meta d-md-down-none">
+                        <strong>{{ $usuarioActual->nombre ?: $usuarioActual->usuario }}</strong>
+                        <small>{{ $roles[$usuarioActual->idrol] ?? 'Usuario' }}</small>
+                    </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
-                    <div class="dropdown-header text-center">
-                        <strong>Cuenta</strong>
-                    </div>
+                    <div class="dropdown-header">{{ '@'.$usuarioActual->usuario }}</div>
                     <a class="dropdown-item" href="{{route('logout')}}"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fa fa-lock"></i> Cerrar sesión</a>
+                    <i class="fa fa-sign-out"></i> Cerrar sesión</a>
 
                     <form id="logout-form" action="{{route('logout')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
@@ -60,18 +77,7 @@
 
     <div class="app-body">
 
-       @if(Auth::check())
-            @if (Auth::user()->idrol == 1)
-                @include('plantilla.sidebaradministrador')
-            @elseif (Auth::user()->idrol == 2)
-                @include('plantilla.sidebarvendedor')
-            @elseif (Auth::user()->idrol == 3)
-                @include('plantilla.sidebarcomprador')
-            @else
-
-            @endif
-
-        @endif
+        @include('plantilla.sidebar')
 
         <!-- Contenido Principal -->
 
@@ -81,8 +87,8 @@
     </div>
 
     <footer class="app-footer">
-        <span><a href="http://www.mike.mavc27@gmail.com/">mike.mavc27@gmail.com</a> &copy; 2019</span>
-        <span class="ml-auto">Desarrollado por <a href="http://www.mike.mavc27@gmail.com/">mike.mavc27@gmail.com</a></span>
+        <span>&copy; {{ date('Y') }} Compras & Ventas</span>
+        <span class="ml-auto">Desarrollado por <a href="mailto:mike.mavc27@gmail.com">Miguel Villalba</a></span>
     </footer>
 
     <!-- Bootstrap and necessary plugins -->
