@@ -43,10 +43,14 @@ docker run --rm \
 # 5. Generar la clave de la aplicación
 ./vendor/bin/sail artisan key:generate
 
-# 6. Ejecutar las migraciones
+# 6. Ejecutar las migraciones y enlazar el almacenamiento de imágenes
 ./vendor/bin/sail artisan migrate
+./vendor/bin/sail artisan storage:link
 
-# 7. Compilar los assets (opcional para desarrollo)
+# 7. (Opcional) Cargar datos de demostración
+./vendor/bin/sail artisan db:seed --class=DemoSeeder
+
+# 8. Compilar los assets (opcional para desarrollo)
 ./vendor/bin/sail npm install
 ./vendor/bin/sail npm run dev
 ```
@@ -83,7 +87,7 @@ El usuario administrador inicial es:
 |-----------|-----------------|
 | `ucevito` | `ab/*06011952`  |
 
-Si la base está vacía, insertar el usuario:
+Si la base está vacía, insertar el usuario (o ejecutar `DemoSeeder`, que también lo crea):
 
 ```bash
 ./vendor/bin/sail artisan tinker --execute="
@@ -93,15 +97,49 @@ DB::table('users')->updateOrInsert(['usuario'=>'ucevito'], [
 ]);"
 ```
 
+## Datos de demostración
+
+`DemoSeeder` carga un año de operación ficticia: 7 categorías, 38 productos,
+8 proveedores, 33 clientes, ~50 compras y ~900 ventas (con algunas anuladas),
+con el stock final coherente con los movimientos. Es determinista y se puede
+volver a ejecutar: **vacía** categorías, productos, proveedores, clientes,
+compras y ventas antes de cargar (no corre en producción).
+
+```bash
+./vendor/bin/sail artisan db:seed --class=DemoSeeder
+```
+
+Además de `ucevito`, crea estos usuarios (contraseña `demo1234`):
+
+| Usuario     | Rol       |
+|-------------|-----------|
+| `vendedor`  | Vendedor  |
+| `comprador` | Comprador |
+| `rgimenez`  | Vendedor  |
+
 ## Roles y permisos
 
-El acceso a los módulos se controla con middlewares (`app/Http/Middleware`):
+El acceso se controla con el middleware `rol` (`app/Http/Middleware/Rol.php`)
+en `routes/web.php`; un usuario que entra a una sección no habilitada recibe un 403.
 
 | Rol           | Módulos                                                              |
 |---------------|--------------------------------------------------------------------|
 | Administrador | Todo (incluye usuarios y roles)                                    |
 | Comprador     | Categorías, productos, proveedores, compras + PDF de compras       |
 | Vendedor      | Categorías, productos, clientes, ventas + PDF de ventas            |
+
+## Stock
+
+El stock se actualiza desde los controladores, dentro de una transacción:
+
+- **Compra registrada**: suma las cantidades al stock.
+- **Venta registrada**: verifica que haya stock suficiente y lo descuenta.
+- **Anular** una compra o venta revierte su efecto (una sola vez).
+
+## Zona horaria
+
+La app y la conexión a PostgreSQL usan `America/Asuncion` (configurable con
+`APP_TIMEZONE` / `DB_TIMEZONE` en `.env`), así "hoy" en el panel es el día local.
 
 ## Reportes PDF
 
