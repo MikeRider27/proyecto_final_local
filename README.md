@@ -12,7 +12,6 @@ clientes, compras y ventas, con reportes en PDF y control de acceso por roles.
 ## Requisitos
 
 - Docker y Docker Compose
-- Acceso a un servidor PostgreSQL
 
 No se necesita PHP ni Composer instalados en la máquina; todo corre dentro de Sail.
 
@@ -57,25 +56,23 @@ La aplicación queda disponible en **http://localhost:8094**
 
 ## Configuración de la base de datos
 
-El contenedor de Sail **no** levanta un PostgreSQL propio: se conecta a un
-servidor PostgreSQL externo. Completar en `.env` con los datos reales del
-servidor (no commitear este archivo):
+Sail levanta su propio contenedor PostgreSQL 15 (servicio `pgsql`). La base,
+el usuario y la contraseña se crean automáticamente la primera vez a partir de
+los valores de `.env`:
 
 ```env
 DB_CONNECTION=pgsql
-DB_HOST=<host-del-servidor>
-DB_PORT=<puerto>
+DB_HOST=pgsql
+DB_PORT=5432
 DB_DATABASE=proyectolaravel
-DB_USERNAME=<usuario>
-DB_PASSWORD=<contraseña>
+DB_USERNAME=sail
+DB_PASSWORD=password
+FORWARD_DB_PORT=5436   # puerto expuesto en el host
 ```
 
-La base indicada en `DB_DATABASE` debe existir en el servidor:
-
-```bash
-PGPASSWORD=<contraseña> psql -h <host> -p <puerto> -U <usuario> \
-    -c "CREATE DATABASE proyectolaravel;"
-```
+Los datos persisten en el volumen Docker `sail-pgsql`. Desde el host se puede
+conectar con cualquier cliente a `localhost:5436`. Para borrar la base y
+empezar de cero: `./vendor/bin/sail down -v`.
 
 ## Acceso
 
@@ -139,9 +136,9 @@ Sugerencia: crear un alias `alias sail='sh $([ -f sail ] && echo sail || echo ve
   redes Docker. Ejecutar `docker network prune -f`.
 - **`Bind for 0.0.0.0:8094 failed: port is already allocated`**: cambiar
   `APP_PORT` en `.env` por un puerto libre y `./vendor/bin/sail up -d` de nuevo.
-- **Error de conexión a la base**: verificar que el servidor PostgreSQL es
-  accesible desde la red, que las credenciales de `.env` son correctas y que la
-  base existe.
+- **Error de conexión a la base**: verificar que el contenedor `pgsql` está
+  arriba (`./vendor/bin/sail ps`). Si se cambiaron las credenciales de `.env`
+  después del primer arranque, recrear el volumen con `./vendor/bin/sail down -v`.
 
 ## 👨‍💻 Autor
 
